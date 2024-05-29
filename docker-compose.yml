@@ -1,0 +1,80 @@
+version: '3.8'
+
+############################################################################
+# This section `secrets` is for sharing secret files between the host
+# and Docker containers.  Unlike `volumes` secrets can be outside the
+# project's directory structure and have special rules to help prevent them
+# from being included in a Docker image.
+#
+# The common development use case is ssh keys for private git repositories.
+############################################################################
+secrets:
+  ssh_key:
+    file: ~/.ssh
+
+############################################################################
+# This section `services` is where the "servers" are.  Each service provides
+# a "server".  Common development use cases are web servers, database
+# servers and testing servers.
+#
+# The purpose of each section of the services is to define how the service
+# interacts with the host.
+############################################################################
+services:
+
+  ##########################################################################
+  # This section defines the PHP development server.
+  ##########################################################################
+  dev-server:
+    # Name the container for easy access now you can access the container
+    # by name `docker exec -it dev-server bash`.  You may need to change this
+    # name if you have a conflict in container names on you system.
+    #    container_name: dev-server
+
+    # This section tells Docker to build a new container using the
+    # setup specified in the given dockerfile.
+    build:
+      context: .
+      dockerfile: .docker/dev/node22.dev.dockerfile
+
+    # This section sets the environment variables inside the Docker container.
+    environment:
+      - TZ=America/Chicago
+      - MYSQL_PWD=i57z9*UIuJQ!  # The user "root" is set up in the dockerfile.
+      - MYSQL_HOST=db
+
+    # `ports` tells Docker to map port 3000 from inside the container to
+    # port 3000 outside the container aka port 3000 on the host.
+    # In this case you can "open" this server by pointing a browser on the
+    # host to http://localhost:3000.
+    # {host port}:{container port}
+    ports:
+      - "3000:3000"
+
+    # `volumes` tells Docker to map folders and files from the host to
+    # inside the Docker container.
+    # NOTE: The host folder/file MUST be inside the project directory.
+    # {host folder}:{container folder}
+    volumes:
+      - ./app:/app
+
+    # This section `command` overrides the default command from the docker image.
+    # We are using this to force Docker to start our own command when the container
+    # starts.  We are further using bash to override some environment variables
+    # only for this command.
+    #
+    # This command starts a Node server on port 80 using our mapped folder `/app`.
+    #
+    command: nodemon server.js
+
+    # `extra_hosts` lets us create DNS hostnames inside our container.
+    # internal:host-gateway will map back to the host system.
+    #
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    # `secrets` allows folders and files specified in the `secrets` at the top of this
+    # file to be mapped inside the container.
+#    secrets:
+#      - source: ssh_key
+#        target: /home/user/.ssh
