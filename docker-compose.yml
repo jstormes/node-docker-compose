@@ -50,6 +50,7 @@ services:
     # {host port}:{container port}
     ports:
       - "3000:3000"
+      - "9229:9229"   # Node Debug port
 
     # `volumes` tells Docker to map folders and files from the host to
     # inside the Docker container.
@@ -65,7 +66,7 @@ services:
     #
     # This command starts a Node server on port 80 using our mapped folder `/app`.
     #
-    command: nodemon server.js
+    command: nodemon --legacy-watch server.js
 
     # `extra_hosts` lets us create DNS hostnames inside our container.
     # internal:host-gateway will map back to the host system.
