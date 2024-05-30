@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Server" type="NodeJSConfigurationType" application-parameters="--legacy-watch" path-to-node="docker-compose://[$PROJECT_DIR$/docker-compose.yml]:dev-server/nodemon" path-to-js-file="server.js" working-dir="$PROJECT_DIR$/app">
+    <method v="2" />
+  </configuration>
+</component>
